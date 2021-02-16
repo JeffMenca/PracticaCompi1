@@ -1,0 +1,59 @@
+
+import java_cup.runtime.*;
+
+parser code {:
+
+	private Symbol s;
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+    public Symbol getS(){
+        return this.s;
+}
+:}
+
+/* Terminales */
+terminal ENTER,ENTERO,COLOR,CURVA,LINEA,CIRCULO,CUADRADO,RECTANGULO,POLIGONO,GRAFICAR,ANIMAR,OBJETO,ANTERIOR;
+terminal SUMA,RESTA,MULTIPLICACION,DIVISION,PARENTESISA,PARENTESISB,COMA,ERROR;
+/* No Terminales */
+non terminal INICIO,FORMA,OPERACION,SIGNO,PROXIMA;
+
+/* Gramatica : */
+start with INICIO;
+INICIO ::= GRAFICAR FORMA
+        | ERROR	{:
+            System.out.println("Error en expresion");
+        :}
+        |
+;   
+
+FORMA ::= LINEA PARENTESISA OPERACION COMA OPERACION COMA OPERACION COMA OPERACION COMA COLOR PARENTESISB 
+| CIRCULO PARENTESISA OPERACION COMA OPERACION COMA OPERACION COMA COLOR PARENTESISB 
+| CUADRADO PARENTESISA OPERACION COMA OPERACION COMA OPERACION COMA COLOR PARENTESISB 
+| RECTANGULO PARENTESISA OPERACION COMA OPERACION COMA OPERACION COMA OPERACION COMA COLOR PARENTESISB 
+| POLIGONO PARENTESISA OPERACION COMA OPERACION COMA OPERACION COMA OPERACION COMA OPERACION COMA COLOR PARENTESISB 
+| ERROR	{:
+            System.out.println("Error en expresion");
+        :}
+;
+
+OPERACION ::= ENTERO SIGNO
+| PARENTESISA OPERACION PARENTESISB SIGNO
+| ERROR	{:
+            System.out.println("Error en expresion3");
+        :}
+;
+
+
+SIGNO ::= SUMA OPERACION
+| RESTA OPERACION
+| MULTIPLICACION OPERACION
+| DIVISION OPERACION
+| ERROR	{:
+            System.out.println("Error en expresion");
+        :}
+|
+;
+
+
+
