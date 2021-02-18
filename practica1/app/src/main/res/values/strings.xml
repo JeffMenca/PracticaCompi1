@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Practica1</string>
+    <string name="action_message">Ingrese su accion</string>
+    <string name="button_send">Compilar</string>
+    <string name="label">Graficador</string>
+    <string name="label_errores">Errores</string>
+</resources>

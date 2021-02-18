@@ -1,0 +1,116 @@
+/* Imports */
+package com.example.practica1.analizador;
+import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
+/* Codigo java del parser*/
+parser code {:
+
+    //Listas
+    private List<String> errorsList;
+    ArrayList<Forma> formasList= new ArrayList<Forma>();;
+	public Parser(lexico lex) {
+		super(lex);
+		this.errorsList = new ArrayList();
+	}
+	@Override
+        public void syntax_error(Symbol st) {
+            //Reporte el error
+        	Token token = (Token) st.value;
+            report_error("Error Sintactico con el  Token:"+ token.getLexeme()+" este no pertenece a la estructura - linea: "+token.getLine()+" - columna: "+token.getColumn() + "\n",null);
+            //Imprime el error
+            System.out.println("Error Sintactico con el Token: " + token.getLexeme() + " este no pertenece a la estructura - linea: " + token.getLine() + ", columna: " + token.getColumn());
+                    errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d. Corrige e intenta de nuevo.", token.getLexeme(), token.getLine(), token.getColumn()));
+        }
+	    //Retorna list de errores sintacticos
+        public List<String> getErrorsList(){
+	        return errorsList;
+	    }
+        //Retorna list de formas
+        public ArrayList getFormasList(){
+	        return formasList;
+	    }
+        //Ingresa datos en array de formas
+        public void addFormasList(Forma forma){
+            try {
+                 formasList.add(forma);
+                }
+            catch(Exception e) {
+                System.out.println("error encontradoo: "+e);
+                }
+	    }
+:};
+
+/* Terminales */
+terminal Token ENTERO,COLOR,CURVA,LINEA,CIRCULO,CUADRADO,RECTANGULO,POLIGONO,GRAFICAR,ANIMAR,OBJETO,ANTERIOR;
+terminal Token SUMA,RESTA,MULTIPLICACION,DIVISION,PARENTESISA,PARENTESISB,COMA;
+/* No Terminales */
+non terminal INICIO,FORMA,GRAFICANDO,PROXIMA,ANIMANDO,TIPOANIMACION;
+non terminal Integer OPERACION; 
+/* Precedencias */
+precedence left SUMA,RESTA;
+precedence left MULTIPLICACION,DIVISION;
+
+/* Gramatica : */
+start with INICIO;
+INICIO ::= GRAFICANDO
+        | error{:System.out.println("Error en expresion");:}
+        |
+;   
+//Graficar
+GRAFICANDO ::= GRAFICAR FORMA{:System.out.println("Encontro graficar");:}
+;   
+
+//Formas
+FORMA ::= LINEA PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:posx2 COMA OPERACION:posy2 COMA COLOR:color PARENTESISB PROXIMA
+{:Linea nuevaLinea=new Linea("linea",posx,posy,color.getLexeme(),posx2,posy2);
+   addFormasList(nuevaLinea); :}
+| CIRCULO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:radio COMA COLOR:color PARENTESISB PROXIMA
+{:Circulo nuevoCirculo=new Circulo("circulo",posx,posy,color.getLexeme(),radio);
+   addFormasList(nuevoCirculo); :}
+| CUADRADO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:tamanioLado COMA COLOR:color PARENTESISB PROXIMA
+{:Cuadrado nuevoCuadrado=new Cuadrado("cuadrado",posx,posy,color.getLexeme(),tamanioLado);
+   addFormasList(nuevoCuadrado); :} 
+| RECTANGULO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:alto COMA OPERACION:ancho COMA COLOR:color PARENTESISB PROXIMA
+{:Rectangulo nuevoRectangulo =new Rectangulo("rectangulo",posx,posy,color.getLexeme(),alto,ancho);
+   addFormasList(nuevoRectangulo); :}
+| POLIGONO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:alto COMA OPERACION:ancho COMA OPERACION:cantidadLados COMA COLOR:color PARENTESISB PROXIMA
+{:Poligono nuevoPoligono=new Poligono("poligono",posx,posy,color.getLexeme(),alto,ancho,cantidadLados);
+   addFormasList(nuevoPoligono);:}
+| error{:System.out.println("Error en expresion");:}
+;
+
+//Operaciones matematicas
+OPERACION ::= OPERACION:numero1 SUMA OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()+numero2.intValue()); :} 
+|OPERACION:numero1 RESTA OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()-numero2.intValue()); :} 
+|OPERACION:numero1 MULTIPLICACION OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()*numero2.intValue()); :} 
+|OPERACION:numero1 DIVISION OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()/numero2.intValue()); :} 
+| ENTERO:n
+{:  RESULT = Integer.valueOf( n.getLexeme()); :} 
+| PARENTESISA OPERACION:operacion PARENTESISB    
+{: RESULT = operacion; :} 
+| error:error{:System.out.println("Error en expresion");:}
+;
+
+//Salto de linea
+PROXIMA ::= GRAFICANDO
+| ANIMANDO
+| 
+;
+
+//Animando
+ANIMANDO ::= ANIMAR OBJETO ANTERIOR PARENTESISA OPERACION COMA OPERACION TIPOANIMACION
+| error{:System.out.println("Error en expresion");:}
+;
+
+//Animacion
+TIPOANIMACION ::= LINEA
+| CURVA
+;
+
+
+
