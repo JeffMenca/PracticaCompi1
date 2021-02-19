@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/background"
     tools:context=".FormasGeneradas">
 
     <TextView
@@ -15,7 +15,7 @@
         android:layout_marginBottom="16dp"
         android:importantForAutofill="no"
         android:text="@string/label"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/editTextAccion"
