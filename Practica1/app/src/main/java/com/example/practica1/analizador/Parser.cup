@@ -3,6 +3,7 @@ package com.example.practica1.analizador;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.practica1.objetos.*;
 /* Codigo java del parser*/
 parser code {:
 

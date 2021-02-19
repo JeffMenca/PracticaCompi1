@@ -7,10 +7,9 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.EditText;
 
-import com.example.practica1.analizador.Forma;
+import com.example.practica1.objetos.Forma;
 import com.example.practica1.analizador.Parser;
-import com.example.practica1.analizador.Poligono;
-import com.example.practica1.analizador.lexico;
+import com.example.practica1.objetos.lexico;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    /** Boton de compilar */
+    /* Boton de compilar */
     public void compilar(View view) {
 
         //recibiendo los componentes del activity main
@@ -38,11 +37,12 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Forma> formas=new ArrayList<Forma>();
         lexico lexico = new lexico(reader);
         Parser parser = new Parser(lexico);
-
+        //Intenta enviar formas encontradas al siguiente Activity
         try {
             parser.parse();
             formas = parser.getFormasList();
             Intent intent = new Intent(this, FormasGeneradas.class);
+            //Crea bundle con array serializable
             Bundle args = new Bundle();
             args.putSerializable("formasEncontradas",(Serializable) formas);
             intent.putExtra("Bundle",args);
