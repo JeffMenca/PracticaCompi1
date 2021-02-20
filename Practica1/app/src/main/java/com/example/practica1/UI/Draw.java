@@ -1,6 +1,7 @@
 //Packages
 package com.example.practica1.UI;
 //Imports
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -22,6 +23,7 @@ import static java.lang.Math.sin;
 
 public class Draw extends View {
     private final ArrayList<Forma> formas;
+
     //Constructor
     public Draw(Context context, ArrayList<Forma> formas) {
         super(context);
@@ -73,16 +75,20 @@ public class Draw extends View {
             } else if (formaElegida.getTipo().equals("poligono")) {
                 pincel = asignarColor(formaElegida.getColor());
                 Poligono nuevoPoligono = (Poligono) formaElegida;
-                float radius = 500f;
+                //Obtiene centro de circulo
+                int centrox = nuevoPoligono.ancho() / 2;
+                int centroy = nuevoPoligono.alto() / 2;
                 Path path = new Path();
-                for (int i = 0; i <= nuevoPoligono.cantidadLados(); i++) {
-                    if (i == 0) {
-                        path.moveTo(nuevoPoligono.posx(), nuevoPoligono.posy());
-                    } else {
-                        path.lineTo(nuevoPoligono.posx() + (float) (nuevoPoligono.ancho() * cos(360 / nuevoPoligono.cantidadLados() * i)), nuevoPoligono.posy() + (float) (nuevoPoligono.alto() * sin(360 / nuevoPoligono.cantidadLados() * i)));
-                    }
+                path.moveTo(nuevoPoligono.posx()+centrox, nuevoPoligono.posy()+centroy);
+                for (int i = 0; i <= 360; i = i + 360 / nuevoPoligono.cantidadLados()) {
+                    //Grados a radianes
+                    float radians = (float) Math.toRadians(i);
+                    //Componentes coseno y seno
+                    float x = (float) Math.cos(radians);
+                    float y = (float) Math.sin(radians);
+                    path.lineTo(nuevoPoligono.posx()+centrox + (centrox * x), nuevoPoligono.posy()+centroy + (centroy * y));
                 }
-                //path.close();
+                path.close();
                 canvas.drawPath(path, pincel);
             }
         }

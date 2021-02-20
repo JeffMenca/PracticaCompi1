@@ -16,9 +16,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String EXTRA_MESSAGE = "com.example.practica1.OBJECTS";
     private EditText editEntrada;
     private EditText errorEntrada;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,24 +33,34 @@ public class MainActivity extends AppCompatActivity {
         errorEntrada = findViewById(R.id.editTextError);
         String entrada = editEntrada.getText().toString();
         StringReader reader = new StringReader(entrada);
+        errorEntrada.getText().clear();
         // ArrayList de formas
-        ArrayList<Forma> formas=new ArrayList<Forma>();
+        ArrayList<Forma> formas = new ArrayList<Forma>();
+        ArrayList<String> errores = new ArrayList<String>();
         lexico lexico = new lexico(reader);
         Parser parser = new Parser(lexico);
         //Intenta enviar formas encontradas al siguiente Activity
         try {
             parser.parse();
             formas = parser.getFormasList();
+            errores = parser.getErrorsList();
+            for (String erroresEncontrados : errores) {
+                errorEntrada.setText(errorEntrada.getText() + erroresEncontrados);
+            }
             Intent intent = new Intent(this, FormasGeneradas.class);
             //Crea bundle con array serializable
             Bundle args = new Bundle();
-            args.putSerializable("formasEncontradas",(Serializable) formas);
-            intent.putExtra("Bundle",args);
+            args.putSerializable("formasEncontradas", formas);
+            intent.putExtra("Bundle", args);
             startActivity(intent);
         } catch (Exception ex) {
-            errorEntrada.setText("Error irrecuperable " + ex);
+            errores = parser.getErrorsList();
+            for (String erroresEncontrados : errores) {
+                errorEntrada.setText(errorEntrada.getText() + erroresEncontrados+ "\n");
+            }
         }
 
-
     }
+
+
 }

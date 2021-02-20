@@ -211,11 +211,10 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
     //Listas
-    private List<String> errorsList;
-    ArrayList<Forma> formasList= new ArrayList<Forma>();;
+    private ArrayList<String> errorsList=new ArrayList<String>();
+    private ArrayList<Forma> formasList= new ArrayList<Forma>();
 	public Parser(lexico lex) {
 		super(lex);
-		this.errorsList = new ArrayList();
 	}
 	@Override
         public void syntax_error(Symbol st) {
@@ -223,11 +222,10 @@ public class Parser extends java_cup.runtime.lr_parser {
         	Token token = (Token) st.value;
             report_error("Error Sintactico con el  Token:"+ token.getLexeme()+" este no pertenece a la estructura - linea: "+token.getLine()+" - columna: "+token.getColumn() + "\n",null);
             //Imprime el error
-            System.out.println("Error Sintactico con el Token: " + token.getLexeme() + " este no pertenece a la estructura - linea: " + token.getLine() + ", columna: " + token.getColumn());
-                    errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d. Corrige e intenta de nuevo.", token.getLexeme(), token.getLine(), token.getColumn()));
+            errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d. Corrige e intenta de nuevo.", token.getLexeme(), token.getLine(), token.getColumn()));
         }
 	    //Retorna list de errores sintacticos
-        public List<String> getErrorsList(){
+        public ArrayList getErrorsList(){
 	        return errorsList;
 	    }
         //Retorna list de formas
@@ -314,7 +312,7 @@ class CUP$Parser$actions {
           case 4: // GRAFICANDO ::= GRAFICAR FORMA 
             {
               Object RESULT =null;
-		System.out.println("Encontro graficar");
+
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("GRAFICANDO",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
