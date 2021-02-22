@@ -1,0 +1,240 @@
+/* Imports */
+package com.example.practica1.analizador;
+import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
+import com.example.practica1.objetos.*;
+/* Codigo java del parser*/
+parser code {:
+
+    //Listas
+    private ArrayList<String> errorsList=new ArrayList<String>();
+    private ArrayList<Forma> formasList= new ArrayList<Forma>();
+    private ArrayList<ErrorFinded> reporteErrorList= new ArrayList<ErrorFinded>();
+    private ArrayList<OperadorFinded> reporteOperadorList= new ArrayList<OperadorFinded>();
+    private ArrayList<ColorFinded> reporteColorList= new ArrayList<ColorFinded>();
+    private ArrayList<ObjetoFinded> reporteObjetoList= new ArrayList<ObjetoFinded>();
+	public Parser(lexico lex) {
+		super(lex);
+	}
+	@Override
+        public void syntax_error(Symbol st) {
+            //Reporte el error
+            List<Integer> lista=expected_token_ids();
+        	Token token = (Token) st.value;
+            report_error("Error Sintactico con el  Token:"+ token.getLexeme()+" este no pertenece a la estructura - linea: "+token.getLine()+" - columna: "+token.getColumn() + "\n",null);
+            //Imprime el error
+            errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d", token.getLexeme(), token.getLine(), token.getColumn()));
+            reporteErrorList.add(new ErrorFinded(token.getLexeme(),token.getLine(),token.getColumn(),"Sintactico","Error sintactico, se esperaba "+tokenEsperado(lista.get(0))));
+        }
+    @Override
+    public List<Integer> expected_token_ids() {
+        return super.expected_token_ids();
+    }
+	    //Retorna list de errores sintacticos
+        public ArrayList getReporteErrorsList(){
+	        return reporteErrorList;
+	    }
+        //Retorna list de errores sintacticos del reporte
+        public ArrayList getErrorsList(){
+	        return errorsList;
+	    }
+        //Retorna list de formas
+        public ArrayList getFormasList(){ 
+	        return formasList;
+	    }
+        //Ingresa datos en array de formas
+        public void addFormasList(Forma forma){
+            try {
+                 formasList.add(forma);
+                }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+         //Retorna list de operadores
+        public ArrayList getOperadoresList(){ 
+	        return reporteOperadorList;
+	    }
+        //Ingresa datos en array de operadores
+        public void addOperadorList(OperadorFinded operador){
+            try {
+                 reporteOperadorList.add(operador);
+                }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+         //Retorna list de colores
+        public ArrayList getColoresList(){ 
+	        return reporteColorList;
+	    }
+        //Ingresa datos en array de colores
+        public void addColorList(String color){
+            boolean colorEncontrado = false;
+            try {
+                if(reporteColorList.size()==0){
+                    ColorFinded nuevoColor=new ColorFinded(color,1);
+                    reporteColorList.add(nuevoColor);
+                }
+                else{
+                    for (ColorFinded coloresEncontrados : reporteColorList) {
+                        if(coloresEncontrados.getColor().equals(color)){
+                            coloresEncontrados.setCantidad(coloresEncontrados.getCantidad()+1);
+                            colorEncontrado=true;
+                        }
+                    }
+                    if(colorEncontrado==false){
+                        ColorFinded nuevoColor=new ColorFinded(color,1);
+                        reporteColorList.add(nuevoColor);
+                    }
+                }      
+            }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+         //Retorna list de objetos
+        public ArrayList getObjetosList(){ 
+	        return reporteObjetoList;
+	    }
+        //Ingresa datos en array de objetos
+        public void addObjetoList(String objeto){
+            boolean objetoEncontrado = false;
+            try {
+                if(reporteObjetoList.size()==0){
+                    ObjetoFinded nuevoObjeto=new ObjetoFinded(objeto,1);
+                    reporteObjetoList.add(nuevoObjeto);
+                }
+                else{
+                    for (ObjetoFinded objetosEncontrados : reporteObjetoList) {
+                        if(objetosEncontrados.getObjeto().equals(objeto)){
+                            objetosEncontrados.setCantidad(objetosEncontrados.getCantidad()+1);
+                            objetoEncontrado=true;
+                        }
+                    }
+                    if(objetoEncontrado==false){
+                        ObjetoFinded nuevoObjeto=new ObjetoFinded(objeto,1);
+                        reporteObjetoList.add(nuevoObjeto);
+                    }
+                }      
+            }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+        private String tokenEsperado(int token){
+                if(token==5)return "linea";
+                else if(token==16)return "*";
+                else if(token==17)return "/";
+                else if(token==14)return "+";
+                else if(token==4)return "curva";
+                else if(token==11)return "animar";
+                else if(token==3)return "color";
+                else if(token==7)return "cuadrado";
+                else if(token==12)return "objeto";
+                else if(token==10)return "graficar";
+                else if(token==20)return ",";
+                else if(token==9)return "poligono";
+                else if(token==6)return "circulo";
+                else if(token==2)return "entero";
+                else if(token==13)return "anterior";
+                else if(token==19)return ")";
+                else if(token==18)return "(";
+                else if(token==8)return "rectangulo";
+                else if(token==15)return "-";
+                else return " ";
+        }
+:};
+
+/* Terminales */
+terminal Token ENTERO,COLOR,CURVA,LINEA,CIRCULO,CUADRADO,RECTANGULO,POLIGONO,GRAFICAR,ANIMAR,OBJETO,ANTERIOR;
+terminal Token SUMA,RESTA,MULTIPLICACION,DIVISION,PARENTESISA,PARENTESISB,COMA;
+/* No Terminales */
+non terminal INICIO,FORMA,GRAFICANDO,PROXIMA,ANIMANDO,TIPOANIMACION;
+non terminal Integer OPERACION; 
+/* Precedencias */
+precedence left SUMA,RESTA;
+precedence left MULTIPLICACION,DIVISION;
+
+/* Gramatica : */
+start with INICIO;
+INICIO ::= GRAFICANDO
+        | error{:System.out.println("Error en expresion");:}
+        |
+;   
+//Graficar
+GRAFICANDO ::= GRAFICAR FORMA
+;   
+
+//Formas
+FORMA ::= LINEA PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:posx2 COMA OPERACION:posy2 COMA COLOR:color PARENTESISB PROXIMA
+{:Linea nuevaLinea=new Linea("linea",posx,posy,color.getLexeme(),posx2,posy2);
+   addFormasList(nuevaLinea);
+   addColorList(color.getLexeme());
+   addObjetoList("Linea"); :}
+| CIRCULO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:radio COMA COLOR:color PARENTESISB PROXIMA
+{:Circulo nuevoCirculo=new Circulo("circulo",posx,posy,color.getLexeme(),radio);
+   addFormasList(nuevoCirculo); 
+   addColorList(color.getLexeme());
+   addObjetoList("Circulo"); :}
+| CUADRADO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:tamanioLado COMA COLOR:color PARENTESISB PROXIMA
+{:Cuadrado nuevoCuadrado=new Cuadrado("cuadrado",posx,posy,color.getLexeme(),tamanioLado);
+   addFormasList(nuevoCuadrado);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Cuadrado"); :} 
+| RECTANGULO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:alto COMA OPERACION:ancho COMA COLOR:color PARENTESISB PROXIMA
+{:Rectangulo nuevoRectangulo =new Rectangulo("rectangulo",posx,posy,color.getLexeme(),alto,ancho);
+   addFormasList(nuevoRectangulo);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Rectangulo"); :}
+| POLIGONO PARENTESISA OPERACION:posx COMA OPERACION:posy COMA OPERACION:alto COMA OPERACION:ancho COMA OPERACION:cantidadLados COMA COLOR:color PARENTESISB PROXIMA
+{:Poligono nuevoPoligono=new Poligono("poligono",posx,posy,color.getLexeme(),alto,ancho,cantidadLados);
+   addFormasList(nuevoPoligono);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Poligono"); :}
+| error{:System.out.println("Error en expresion");:}
+;
+
+//Operaciones matematicas
+OPERACION ::= OPERACION:numero1 SUMA:signo OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()+numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Suma", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"+"+numero2)); 
+reporteOperadorList.add(nuevoOperador);:} 
+|OPERACION:numero1 RESTA:signo OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()-numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Resta", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"-"+numero2)); 
+reporteOperadorList.add(nuevoOperador);:} 
+|OPERACION:numero1 MULTIPLICACION:signo OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()*numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Multiplicacion", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"*"+numero2)); 
+reporteOperadorList.add(nuevoOperador);:} 
+|OPERACION:numero1 DIVISION:signo OPERACION:numero2 
+{: RESULT = new Integer(numero1.intValue()/numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Division", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"/"+numero2));
+reporteOperadorList.add(nuevoOperador);:}  
+| ENTERO:n
+{:  RESULT = Integer.valueOf( n.getLexeme()); :} 
+| PARENTESISA OPERACION:operacion PARENTESISB    
+{: RESULT = operacion; :} 
+| error:error{:System.out.println("Error en expresion");:}
+;
+
+//Salto de linea
+PROXIMA ::= GRAFICANDO
+| ANIMANDO
+| 
+;
+
+//Animando
+ANIMANDO ::= ANIMAR OBJETO ANTERIOR PARENTESISA OPERACION COMA OPERACION TIPOANIMACION
+| error{:System.out.println("Error en expresion");:}
+;
+
+//Animacion
+TIPOANIMACION ::= LINEA
+| CURVA
+;
+
+
+
