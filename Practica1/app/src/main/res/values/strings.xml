@@ -4,4 +4,13 @@
     <string name="button_send">Compilar</string>
     <string name="label">Graficador</string>
     <string name="label_errores">Errores</string>
+    <string name="button_reporteerror">Ver reporte de errores</string>
+    <string name="lexema">Lexema</string>
+    <string name="linea">Linea</string>
+    <string name="columna">Columna</string>
+    <string name="tipo">Tipo</string>
+    <string name="descripcion">Descripcion</string>
+    <string name="ver_reporte_de_operadores">Ver reporte de operadores</string>
+    <string name="ver_reporte_de_colores">Ver reporte de colores</string>
+    <string name="ver_reporte_de_objetos">Ver reporte de Objetos</string>
 </resources>

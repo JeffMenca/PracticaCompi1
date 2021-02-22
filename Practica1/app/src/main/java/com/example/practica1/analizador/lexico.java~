@@ -3,12 +3,11 @@
 // source: lexico.jflex
 
 /*Seccion codigo de usuario*/
-package com.example.practica1.objetos;
-import com.example.practica1.analizador.Token;
-import com.example.practica1.analizador.sym;
-
+package com.example.practica1.analizador;
 import java_cup.runtime.*;
+import com.example.practica1.objetos.*;
 import java.io.Reader;
+import java.util.ArrayList;
 
 // See https://github.com/jflex-de/jflex/issues/222
 @SuppressWarnings("FallThrough")
@@ -323,6 +322,13 @@ public class lexico implements java_cup.runtime.Scanner {
   private boolean zzEOFDone;
 
   /* user code: */
+      private ArrayList<ErrorFinded> reporteErrorList= new ArrayList<ErrorFinded>();
+      
+      //Retorna list de errores sintacticos
+        public ArrayList getReporteErrorsList(){
+	        return reporteErrorList;
+	    }
+
       private Symbol symbol(int type, String lexema) {
         return new Symbol(type, new Token(lexema, yyline + 1, yycolumn + 1));
       }
@@ -734,7 +740,8 @@ public class lexico implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { return symbol(sym.error,yytext());
+            { reporteErrorList.add(new ErrorFinded(yytext(),yyline + 1,yycolumn + 1,"Lexico","Símbolo no existe en el lenguaje"));
+  return symbol(sym.error,yytext());
             }
             // fall through
           case 23: break;

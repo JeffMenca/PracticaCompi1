@@ -1,7 +1,9 @@
 /*Seccion codigo de usuario*/
-package analizador;
+package com.example.practica1.analizador;
 import java_cup.runtime.*;
+import com.example.practica1.objetos.*;
 import java.io.Reader;
+import java.util.ArrayList;
 %%
 
 /*Seccion configuracion*/
@@ -14,6 +16,13 @@ import java.io.Reader;
 
 //Metodos
 %{
+      private ArrayList<ErrorFinded> reporteErrorList= new ArrayList<ErrorFinded>();
+      
+      //Retorna list de errores sintacticos
+        public ArrayList getReporteErrorsList(){
+	        return reporteErrorList;
+	    }
+
       private Symbol symbol(int type, String lexema) {
         return new Symbol(type, new Token(lexema, yyline + 1, yycolumn + 1));
       }
@@ -72,4 +81,6 @@ COMA=(",")
 }
 
 /*Errores y signos encontrados*/
-[^] {return symbol(sym.error,yytext()); }
+[^] {
+  reporteErrorList.add(new ErrorFinded(yytext(),yyline + 1,yycolumn + 1,"Lexico","Símbolo no existe en el lenguaje"));
+  return symbol(sym.error,yytext()); }

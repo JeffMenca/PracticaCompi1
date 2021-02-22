@@ -213,23 +213,37 @@ public class Parser extends java_cup.runtime.lr_parser {
     //Listas
     private ArrayList<String> errorsList=new ArrayList<String>();
     private ArrayList<Forma> formasList= new ArrayList<Forma>();
+    private ArrayList<ErrorFinded> reporteErrorList= new ArrayList<ErrorFinded>();
+    private ArrayList<OperadorFinded> reporteOperadorList= new ArrayList<OperadorFinded>();
+    private ArrayList<ColorFinded> reporteColorList= new ArrayList<ColorFinded>();
+    private ArrayList<ObjetoFinded> reporteObjetoList= new ArrayList<ObjetoFinded>();
 	public Parser(lexico lex) {
 		super(lex);
 	}
 	@Override
         public void syntax_error(Symbol st) {
             //Reporte el error
+            List<Integer> lista=expected_token_ids();
         	Token token = (Token) st.value;
             report_error("Error Sintactico con el  Token:"+ token.getLexeme()+" este no pertenece a la estructura - linea: "+token.getLine()+" - columna: "+token.getColumn() + "\n",null);
             //Imprime el error
-            errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d. Corrige e intenta de nuevo.", token.getLexeme(), token.getLine(), token.getColumn()));
+            errorsList.add(String.format("Error Sintactico con el Token: '%s' este no pertenece a la estructura- linea: %d  columna: %d", token.getLexeme(), token.getLine(), token.getColumn()));
+            reporteErrorList.add(new ErrorFinded(token.getLexeme(),token.getLine(),token.getColumn(),"Sintactico","Error sintactico, se esperaba "+tokenEsperado(lista.get(0))));
         }
+    @Override
+    public List<Integer> expected_token_ids() {
+        return super.expected_token_ids();
+    }
 	    //Retorna list de errores sintacticos
+        public ArrayList getReporteErrorsList(){
+	        return reporteErrorList;
+	    }
+        //Retorna list de errores sintacticos del reporte
         public ArrayList getErrorsList(){
 	        return errorsList;
 	    }
         //Retorna list de formas
-        public ArrayList getFormasList(){
+        public ArrayList getFormasList(){ 
 	        return formasList;
 	    }
         //Ingresa datos en array de formas
@@ -238,9 +252,102 @@ public class Parser extends java_cup.runtime.lr_parser {
                  formasList.add(forma);
                 }
             catch(Exception e) {
-                System.out.println("error encontradoo: "+e);
+                System.out.println("error encontrado: "+e);
                 }
 	    }
+         //Retorna list de operadores
+        public ArrayList getOperadoresList(){ 
+	        return reporteOperadorList;
+	    }
+        //Ingresa datos en array de operadores
+        public void addOperadorList(OperadorFinded operador){
+            try {
+                 reporteOperadorList.add(operador);
+                }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+         //Retorna list de colores
+        public ArrayList getColoresList(){ 
+	        return reporteColorList;
+	    }
+        //Ingresa datos en array de colores
+        public void addColorList(String color){
+            boolean colorEncontrado = false;
+            try {
+                if(reporteColorList.size()==0){
+                    ColorFinded nuevoColor=new ColorFinded(color,1);
+                    reporteColorList.add(nuevoColor);
+                }
+                else{
+                    for (ColorFinded coloresEncontrados : reporteColorList) {
+                        if(coloresEncontrados.getColor().equals(color)){
+                            coloresEncontrados.setCantidad(coloresEncontrados.getCantidad()+1);
+                            colorEncontrado=true;
+                        }
+                    }
+                    if(colorEncontrado==false){
+                        ColorFinded nuevoColor=new ColorFinded(color,1);
+                        reporteColorList.add(nuevoColor);
+                    }
+                }      
+            }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+         //Retorna list de objetos
+        public ArrayList getObjetosList(){ 
+	        return reporteObjetoList;
+	    }
+        //Ingresa datos en array de objetos
+        public void addObjetoList(String objeto){
+            boolean objetoEncontrado = false;
+            try {
+                if(reporteObjetoList.size()==0){
+                    ObjetoFinded nuevoObjeto=new ObjetoFinded(objeto,1);
+                    reporteObjetoList.add(nuevoObjeto);
+                }
+                else{
+                    for (ObjetoFinded objetosEncontrados : reporteObjetoList) {
+                        if(objetosEncontrados.getObjeto().equals(objeto)){
+                            objetosEncontrados.setCantidad(objetosEncontrados.getCantidad()+1);
+                            objetoEncontrado=true;
+                        }
+                    }
+                    if(objetoEncontrado==false){
+                        ObjetoFinded nuevoObjeto=new ObjetoFinded(objeto,1);
+                        reporteObjetoList.add(nuevoObjeto);
+                    }
+                }      
+            }
+            catch(Exception e) {
+                System.out.println("error encontrado: "+e);
+                }
+	    }
+        private String tokenEsperado(int token){
+                if(token==5)return "linea";
+                else if(token==16)return "*";
+                else if(token==17)return "/";
+                else if(token==14)return "+";
+                else if(token==4)return "curva";
+                else if(token==11)return "animar";
+                else if(token==3)return "color";
+                else if(token==7)return "cuadrado";
+                else if(token==12)return "objeto";
+                else if(token==10)return "graficar";
+                else if(token==20)return ",";
+                else if(token==9)return "poligono";
+                else if(token==6)return "circulo";
+                else if(token==2)return "entero";
+                else if(token==13)return "anterior";
+                else if(token==19)return ")";
+                else if(token==18)return "(";
+                else if(token==8)return "rectangulo";
+                else if(token==15)return "-";
+                else return " ";
+        }
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -337,7 +444,9 @@ class CUP$Parser$actions {
 		int colorright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Token color = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		Linea nuevaLinea=new Linea("linea",posx,posy,color.getLexeme(),posx2,posy2);
-   addFormasList(nuevaLinea); 
+   addFormasList(nuevaLinea);
+   addColorList(color.getLexeme());
+   addObjetoList("Linea"); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("FORMA",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-12)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -360,6 +469,8 @@ class CUP$Parser$actions {
 		Token color = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		Circulo nuevoCirculo=new Circulo("circulo",posx,posy,color.getLexeme(),radio);
    addFormasList(nuevoCirculo); 
+   addColorList(color.getLexeme());
+   addObjetoList("Circulo"); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("FORMA",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-10)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -381,7 +492,9 @@ class CUP$Parser$actions {
 		int colorright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Token color = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		Cuadrado nuevoCuadrado=new Cuadrado("cuadrado",posx,posy,color.getLexeme(),tamanioLado);
-   addFormasList(nuevoCuadrado); 
+   addFormasList(nuevoCuadrado);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Cuadrado"); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("FORMA",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-10)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -406,7 +519,9 @@ class CUP$Parser$actions {
 		int colorright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Token color = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		Rectangulo nuevoRectangulo =new Rectangulo("rectangulo",posx,posy,color.getLexeme(),alto,ancho);
-   addFormasList(nuevoRectangulo); 
+   addFormasList(nuevoRectangulo);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Rectangulo"); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("FORMA",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-12)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -435,6 +550,8 @@ class CUP$Parser$actions {
 		Token color = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		Poligono nuevoPoligono=new Poligono("poligono",posx,posy,color.getLexeme(),alto,ancho,cantidadLados);
    addFormasList(nuevoPoligono);
+   addColorList(color.getLexeme()); 
+   addObjetoList("Poligono"); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("FORMA",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-14)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -455,10 +572,15 @@ class CUP$Parser$actions {
 		int numero1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int numero1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Integer numero1 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int signoleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int signoright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Token signo = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int numero2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int numero2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Integer numero2 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = new Integer(numero1.intValue()+numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Suma", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"+"+numero2)); 
+reporteOperadorList.add(nuevoOperador);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("OPERACION",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -470,10 +592,15 @@ class CUP$Parser$actions {
 		int numero1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int numero1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Integer numero1 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int signoleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int signoright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Token signo = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int numero2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int numero2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Integer numero2 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = new Integer(numero1.intValue()-numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Resta", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"-"+numero2)); 
+reporteOperadorList.add(nuevoOperador);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("OPERACION",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -485,10 +612,15 @@ class CUP$Parser$actions {
 		int numero1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int numero1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Integer numero1 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int signoleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int signoright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Token signo = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int numero2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int numero2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Integer numero2 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = new Integer(numero1.intValue()*numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Multiplicacion", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"*"+numero2)); 
+reporteOperadorList.add(nuevoOperador);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("OPERACION",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -500,10 +632,15 @@ class CUP$Parser$actions {
 		int numero1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int numero1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Integer numero1 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int signoleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int signoright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Token signo = (Token)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int numero2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int numero2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Integer numero2 = (Integer)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 RESULT = new Integer(numero1.intValue()/numero2.intValue()); 
+OperadorFinded nuevoOperador=new OperadorFinded("Division", signo.getLine(),signo.getColumn(),String.valueOf(numero1+"/"+numero2));
+reporteOperadorList.add(nuevoOperador);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("OPERACION",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
